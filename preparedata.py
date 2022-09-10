@@ -37,11 +37,14 @@ def random_transform(config):
 
 
 def process_file_bu_3dfe(config, file_name, output_dir):
-    bu_3dfe_dir = config['preparedata']['raw_data_dir']
+    folder_name = os.path.dirname(file_name)
+    CUSTOM_dir = config['preparedata']['raw_data_dir']
     base_name = os.path.basename(file_name)
-    name_pd = bu_3dfe_dir + file_name + '_RAW.wrl'
-    name_bmp = bu_3dfe_dir + file_name + '_F3D.bmp'
-    name_lm = bu_3dfe_dir + file_name + '_RAW_84_LMS.txt'
+    name_pd = CUSTOM_dir + file_name + '.obj'
+    texture_path = CUSTOM_dir + folder_name
+    name_mat = CUSTOM_dir + file_name + '.mtl'
+    name_jpg = CUSTOM_dir + file_name + '.jpg'
+    name_lm = CUSTOM_dir + file_name + '.txt'
 
     name_path = os.path.dirname(file_name)
     o_dir_image = output_dir + '/images/' + name_path + '/'
@@ -56,8 +59,11 @@ def process_file_bu_3dfe(config, file_name, output_dir):
     if not os.path.isfile(name_pd):
         print(name_pd, ' could not read')
         return False
-    if not os.path.isfile(name_bmp):
-        print(name_bmp, ' could not read')
+    if not os.path.isfile(name_mat):
+        print(name_mat, ' could not read')
+        return False
+    if not os.path.isfile(name_jpg):
+        print(name_jpg, ' could not read')
         return False
     if not os.path.isfile(name_lm):
         print(name_lm, ' could not read')
@@ -85,16 +91,19 @@ def process_file_bu_3dfe(config, file_name, output_dir):
     lms.SetPoints(points)
     del points
 
-    vrmlin = vtk.vtkVRMLImporter()
-    vrmlin.SetFileName(name_pd)
-    vrmlin.Update()
+    objin = vtk.vtkOBJImporter()
+    
+    objin.SetFileName(name_pd)
+    objin.SetFileNameMTL(name_mat)
+    objin.SetTexturePath(texture_path)
+    objin.Update()
 
-    pd = vrmlin.GetRenderer().GetActors().GetLastActor().GetMapper().GetInput()
+    pd = objin.GetRenderer().GetActors().GetLastActor().GetMapper().GetInput()
     pd.GetPointData().SetScalars(None)
 
     # Load texture
-    texture_image = vtk.vtkBMPReader()
-    texture_image.SetFileName(name_bmp)
+    texture_image = vtk.vtkJPEGReader()
+    texture_image.SetFileName(name_jpg)
     texture_image.Update()
 
     texture = vtk.vtkTexture()
@@ -249,7 +258,7 @@ def process_file_bu_3dfe(config, file_name, output_dir):
                 f.write(line)
             f.close()
 
-    del writer_png_2, writer_png, ren_win, actor_geometry, actor_text, mapper, w2if, t, trans, vrmlin, texture
+    del writer_png_2, writer_png, ren_win, actor_geometry, actor_text, mapper, w2if, t, trans, objin, texture
     del texture_image
     del lms, trans_lm
 
@@ -267,31 +276,22 @@ def split_data_into_train_and_test(base_file_names, output_dir):
     new_set = []
 
     for name in base_file_names:
-        n1 = os.path.dirname(name)
-        if n1.find('F') > -1:
-            n1 = n1.replace('F', '')
-            num = int(n1)
-            if num < 47:
-                new_set.append(name)
-                f1.write(name + '\n')
-            else:
-                f2.write(name + '\n')
-        if n1.find('M') > -1:
-            n1 = n1.replace('M', '')
-            num = int(n1)
-            if num < 35:
-                new_set.append(name)
-                f1.write(name + '\n')
-            else:
-                f2.write(name + '\n')
+        n1 = int(os.path.dirname(name).split('/')[-1])
+        if n1 % 3 != 0 :
+            #Training
+            new_set.append(str(name))
+            f1.write(name + '\n')
+        else:
+            #Test
+            f2.write(name + '\n')
     f1.close()
     f2.close()
     return new_set
 
 
 def prepare_bu_3dfe_data(config):
-    print('Preparing BU-3DFE data')
-    file_id_list = config['preparedata']['raw_data_dir'] + 'BU_3DFE_base_filelist_noproblems.txt'
+    print('Preparing CUSTOM data')
+    file_id_list = config['preparedata']['raw_data_dir'] + 'CUSTOM_base_filelist_noproblems.txt'
     output_dir = config['preparedata']['processed_data_dir']
     image_out_dir = output_dir + 'images/'
     lm_out_dir = output_dir + '2D LM/'
@@ -323,7 +323,7 @@ def prepare_bu_3dfe_data(config):
 
 def main(config):
     model_data_name = config['name']
-    if model_data_name.find('BU_3DFE') > -1:
+    if model_data_name.find('CUSTOM') > -1:
         prepare_bu_3dfe_data(config)
 
 
