@@ -6,6 +6,7 @@ from sklearn.metrics.pairwise import euclidean_distances
 from numpy.linalg import norm
 import sys
 import os
+from matplotlib import pyplot as plt
 #from sklearn.metrics.mean_squared_error
 
 
@@ -81,5 +82,12 @@ def main(argv):
     print(f'Landmark più critico: {max(RMSE_dict_landmarks, key=RMSE_dict_landmarks.get)}')
     for key in RMSE_dict_landmarks.keys():
         print(str(key) + ' - ' + str(RMSE_dict_landmarks[key]))
+    plt.grid(True, axis='y')
+    plt.bar([str(i) for i in RMSE_dict_landmarks.keys()], RMSE_dict_landmarks.values())
+    plt.xlim((-1,50))
+    plt.xlabel("ID landmark")
+    plt.ylabel("RMSE")
+    plt.show()
+    
 if "__main__":
     main(sys.argv)
