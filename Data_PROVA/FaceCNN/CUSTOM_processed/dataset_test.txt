@@ -1,2 +1,0 @@
-faces3D/1/1
-faces3D/7/7
