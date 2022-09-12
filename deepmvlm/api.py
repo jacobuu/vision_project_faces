@@ -33,13 +33,16 @@ class DeepMVLM:
         return device, list_ids
 
     def _get_device_and_load_model_from_url(self):
+        import pathlib
+        temp = pathlib.PosixPath
+        pathlib.PosixPath = pathlib.WindowsPath
         logger = self.config.get_logger('test')
 
         print('Initialising model')
         model = self.config.initialize('arch', module_arch)
 
         print('Loading checkpoint')
-        model_dir = self.config['trainer']['save_dir'] + "/trained/"
+        model_dir = self.config['trainer']['save_dir'] + "trained/"
         model_name = self.config['name']
         image_channels = self.config['data_loader']['args']['image_channels']
         name_channels = model_name + '-' + image_channels

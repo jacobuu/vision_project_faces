@@ -23,7 +23,10 @@ def process_file_list(config, file_name):
         for line in f:
             line = (line.strip("/n")).strip("\n")
             if len(line) > 4:
-                names.append(line)
+                with_path = config["preparedata"]["raw_data_dir"] + line + '.obj'
+                names.append(with_path)
+                print(with_path)
+
     print('Processing ', len(names), ' meshes')
     dm = deepmvlm.DeepMVLM(config)
     for file_name in names:

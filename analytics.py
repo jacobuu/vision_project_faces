@@ -12,7 +12,7 @@ import os
 def main(argv):
 
     faces = []
-    prova = "Data_PROVA"
+    prova = "Data"
     with open(prova + "/FaceCNN/CUSTOM_processed/dataset_test.txt") as f:
         for line in f:
             faces.append(prova + '/FaceCNN/CUSTOM/' + line.strip())

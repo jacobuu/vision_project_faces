@@ -50,7 +50,10 @@ def compute_metrics(landmks, landmks_TRUE):
     print(f"Computing metrics...")
     sum = 0
     for i in range(0,50):
-        sum += euclidean_distances(landmks[i], landmks_TRUE[i])
+        error=0
+        for coord in range(0,3):
+            error += (landmks[i][coord]-landmks_TRUE[i][coord])**2
+        sum += np.sqrt(error)
     mean = sum/50
     return mean
 
@@ -67,9 +70,6 @@ def main(argv):
     _, dir_name = os.path.split(path)
     if not os.path.exists(path + '/' + dir_name + '.obj'):
         print(f"In the specified directory there is not the {dir_name}.obj file")
-        return
-    if not os.path.exists(path + '/' + dir_name + '.mtl'):
-        print(f"In the specified directory there is not the {dir_name}.mtl file")
         return
     if not os.path.exists(path + '/' + dir_name + '_landmarks.txt'):
         print(f"You must use: python predict.py --c configs\CUSTOM-RGB+depth.json --n {path}/{dir_name}.obj")
@@ -99,8 +99,8 @@ def main(argv):
     poly["id"] = ldks_ID
 
     pl = pv.Plotter()
-    pl.add_mesh(mesh, show_edges=False, color='white')
-    pl.add_point_labels(poly, "id", point_size=1.0, text_color='white', shape_color='black', always_visible=True)
+    pl.add_mesh(mesh, show_edges=False, color='white', ambient=True)
+    pl.add_point_labels(poly, "id", point_size=1.0, text_color='white', shape_color='black')
     pl.camera_position = 'xy'
     pl.show()
 

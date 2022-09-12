@@ -1,0 +1,6 @@
+Validation: 122/123 Loss: 0.000184 Time per batch: 0.18756 Time left in validation: 0:00:00.187558
+    epoch          : 71
+    loss           : 4.4963724487385086e-05
+    val_loss       : 0.00016846820275295466
+    val_my_metric  : 0.0
+    val_my_metric2 : 0.0
