@@ -54,7 +54,7 @@ class DeepMVLM:
         logger.info('Loading checkpoint: {}'.format(check_point_name))
 
         # checkpoint = load_url(check_point_name, model_dir, map_location=device)
-        checkpoint = torch.load(model_dir + check_point_name)
+        checkpoint = torch.load(model_dir + check_point_name, map_location=device)
         # Write clean model - should only be done once for translation of models
         base_name = os.path.basename(os.path.splitext(check_point_name)[0])
         clean_file = 'saved/trained/' + base_name + '_only_state_dict.pth'

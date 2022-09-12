@@ -74,9 +74,9 @@ def main(argv):
     if not os.path.exists(path + '/' + dir_name + '_landmarks.txt'):
         print(f"You must use: python predict.py --c configs\CUSTOM-RGB+depth.json --n {path}/{dir_name}.obj")
         return
-    if not os.path.exists(path + '/' + dir_name + '_landmarks.vtk'):
-        print(f"You must use: python predict.py --c configs\CUSTOM-RGB+depth.json --n {path}/{dir_name}.obj")
-        return
+    # if not os.path.exists(path + '/' + dir_name + '_landmarks.vtk'):
+    #     print(f"You must use: python predict.py --c configs\CUSTOM-RGB+depth.json --n {path}/{dir_name}.obj")
+    #     return
 
     DATA_DIR = path
     face = dir_name
@@ -99,7 +99,7 @@ def main(argv):
     poly["id"] = ldks_ID
 
     pl = pv.Plotter()
-    pl.add_mesh(mesh, show_edges=False, color='white', ambient=True)
+    pl.add_mesh(mesh, show_edges=False, color='white')
     pl.add_point_labels(poly, "id", point_size=1.0, text_color='white', shape_color='black')
     pl.camera_position = 'xy'
     pl.show()
