@@ -85,6 +85,7 @@ def main(argv):
     plt.grid(True, axis='y')
     plt.bar([str(i) for i in RMSE_dict_landmarks.keys()], RMSE_dict_landmarks.values())
     plt.xlim((-1,50))
+    plt.ylim((0, 65))
     plt.xlabel("ID landmark")
     plt.ylabel("RMSE")
     plt.show()
