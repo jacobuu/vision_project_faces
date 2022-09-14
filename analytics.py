@@ -42,6 +42,7 @@ def main(argv):
     
     # RMSE medio totale
     RMSE_dict = {}
+    sum_distances = 0
     for key in faces_list:
         face = faces_list[key]
         
@@ -54,18 +55,22 @@ def main(argv):
             for coor in range(0, 3):
                 error += (lmks_pred_face[i][coor] - lmks_true_face[i][coor])**2
             distance = np.sqrt(error)
+            sum_distances += distance
             sum+=distance**2
         MSE = sum/50
         RMSE = np.sqrt(MSE)
         RMSE_dict[key] = RMSE
     
     print(RMSE_dict)
+    print(f'Distanza media euclidea: {sum_distances/(50*len(faces_list))} mm')
     mean = np.mean([RMSE_dict[i] for i in RMSE_dict.keys()])
     print(f"Total RMSE: {mean}")
     
     RMSE_dict_landmarks = {}
+    DIST_dict_landmarks = {}
     for i in range(0,50):
         sum_distances = 0
+        sum_distances_sq = 0
         for key in faces_list:
             face = faces_list[key]
             lmks_pred_face = np.asarray(face['lmks_pred'][i])
@@ -74,21 +79,36 @@ def main(argv):
             for coor in range(0, 3):
                 error += (lmks_pred_face[coor] - lmks_true_face[coor])**2
             distance = np.sqrt(error)
-            sum_distances+=distance**2
-        MSE = sum_distances/len(faces_list)
+            sum_distances+=distance
+            sum_distances_sq+=distance**2
+        MEAN_DISTANCE = sum_distances/len(faces_list)
+        MSE = sum_distances_sq/len(faces_list)
         RMSE = np.sqrt(MSE)
+        DIST_dict_landmarks[i+1] = MEAN_DISTANCE
         RMSE_dict_landmarks[i+1] = RMSE
 
-    print(f'Landmark più critico: {max(RMSE_dict_landmarks, key=RMSE_dict_landmarks.get)}')
+
+    print(f'Landmark più critico (distanza euclidea max): {max(DIST_dict_landmarks, key=DIST_dict_landmarks.get)} mm')
+    print(f'Landmark più critico (RMSE max): {max(RMSE_dict_landmarks, key=RMSE_dict_landmarks.get)}')
     for key in RMSE_dict_landmarks.keys():
         print(str(key) + ' - ' + str(RMSE_dict_landmarks[key]))
+    plt.subplot(2, 1, 1)
     plt.grid(True, axis='y')
     plt.bar([str(i) for i in RMSE_dict_landmarks.keys()], RMSE_dict_landmarks.values())
     plt.xlim((-1,50))
     plt.ylim((0, 65))
     plt.xlabel("ID landmark")
     plt.ylabel("RMSE")
+    plt.subplot(2, 1, 2)
+    plt.grid(True, axis='y')
+    plt.bar([str(i) for i in DIST_dict_landmarks.keys()], DIST_dict_landmarks.values())
+    plt.xlim((-1,50))
+    plt.ylim((0, 65))
+    plt.xlabel("ID landmark")
+    plt.ylabel("Euclidean Distance (mm)")
     plt.show()
+
+
     
 if "__main__":
     main(sys.argv)
