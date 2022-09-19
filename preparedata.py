@@ -268,8 +268,7 @@ def process_file_bu_3dfe(config, file_name, output_dir):
 def split_data_into_train_and_test(base_file_names, output_dir):
     train_file = output_dir + "dataset_train.txt"
     test_file = output_dir + "dataset_test.txt"
-    # F0001-F0046 + M0001-M0034 are used for training
-    # F0047-F0056 + M0035-M0054 are used for testing
+    
     f1 = open(train_file, 'w')
     f2 = open(test_file, 'w')
 

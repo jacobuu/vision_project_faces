@@ -88,10 +88,8 @@ def main(argv):
         RMSE_dict_landmarks[i+1] = RMSE
 
 
-    print(f'Landmark più critico (distanza euclidea max): {max(DIST_dict_landmarks, key=DIST_dict_landmarks.get)} mm')
-    print(f'Landmark più critico (RMSE max): {max(RMSE_dict_landmarks, key=RMSE_dict_landmarks.get)}')
-    for key in RMSE_dict_landmarks.keys():
-        print(str(key) + ' - ' + str(RMSE_dict_landmarks[key]))
+    print(f'Landmark più critico: {max(DIST_dict_landmarks, key=DIST_dict_landmarks.get)}')
+    
     plt.subplot(2, 1, 1)
     plt.grid(True, axis='y')
     plt.bar([str(i) for i in RMSE_dict_landmarks.keys()], RMSE_dict_landmarks.values())
