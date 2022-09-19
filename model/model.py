@@ -167,11 +167,12 @@ class MVLMModel(BaseModel):
         else:
             print("Image channels should be: geometry, RGB, depth, RGB+depth or geometry+depth")
             self.in_channels = 1
+        #                       (4, 64)
         self.conv1 = nn.Conv2d(self.in_channels, int(self.features/4), kernel_size=3, stride=1, padding=1)
-        self.bn1 = nn.BatchNorm2d(int(self.features/4))
-        self.conv2 = ResidualBlock(int(self.features/4), int(self.features/2))
-        self.conv3 = ResidualBlock(int(self.features/2), int(self.features/2))
-        self.conv4 = ResidualBlock(int(self.features/2), self.features)
+        self.bn1 = nn.BatchNorm2d(int(self.features/4)) # 64
+        self.conv2 = ResidualBlock(int(self.features/4), int(self.features/2)) # 64, 128
+        self.conv3 = ResidualBlock(int(self.features/2), int(self.features/2)) # 128 128
+        self.conv4 = ResidualBlock(int(self.features/2), self.features) # 128 256
         self.hg1 = HourGlassModule(self.features)
         self.hg2 = HourGlassModule(self.features)
         self.dropout1 = nn.Dropout(self.dropout_rate)
