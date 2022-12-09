@@ -94,13 +94,15 @@ def main(argv):
     landmks_TRUE, ldks_TRUE_ID = landmks_load(file_true_lks)
     RMSE = compute_metrics(landmks, landmks_TRUE)
     print(f"RMSE: {RMSE}")
-
+    poly2 = pv.PolyData(landmks_TRUE)
+    poly2["id"] = ldks_TRUE_ID
     poly = pv.PolyData(landmks)
     poly["id"] = ldks_ID
 
     pl = pv.Plotter()
     pl.add_mesh(mesh, show_edges=False, color='white')
-    pl.add_point_labels(poly, "id", point_size=1.0, text_color='white', shape_color='black')
+    pl.add_point_labels(poly, "id", point_size=1.0, text_color='white', shape_color='red')
+    pl.add_point_labels(poly2, "id", point_size=1.0, text_color='white', shape_color='black')
     pl.camera_position = 'xy'
     pl.show()
 
