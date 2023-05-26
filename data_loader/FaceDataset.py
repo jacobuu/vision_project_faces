@@ -14,7 +14,9 @@ class FaceDataset(Dataset):
     def __init__(self, csv_file, root_dir, heatmap_size=256, image_size=256, image_channels="RGB",
                  n_views=96, tfrm=None):
         """
-        Args:
+        Args:Anche io quando vedo che non vanno le
+          cose mi sposto èi ùla 
+
             csv_file (string): Path to the csv/txt file with file ids.
             root_dir (string): Root directory for data.
             tfrm (callable, optional): Optional transform to be applied
