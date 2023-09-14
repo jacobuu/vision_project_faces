@@ -1,5 +1,5 @@
 {
-  "name": "MVLMModel_CUSTOM",
+  "name": "MVLMModel_BU_3DFE",
   "n_gpu": 1,
 
   "arch": {
@@ -8,16 +8,16 @@
       "n_landmarks": 84,
       "n_features": 256,
       "dropout_rate": 0.2,
-      "image_channels": "RGB+depth"
+      "image_channels": "geometry+depth"
     }
   },
   "data_loader": {
     "type": "FaceDataLoader",
     "args": {
-      "data_dir": "Data/FaceCNN/CUSTOM_processed/",
+      "data_dir": "",
       "heatmap_size": 256,
       "image_size": 256,
-      "image_channels": "RGB+depth",
+      "image_channels": "geometry+depth",
       "n_views": 96,
       "batch_size": 8,
       "shuffle": true,
@@ -60,21 +60,21 @@
     "heatmap_abs_threshold": 0.5,
     "write_renderings": false,
     "off_screen_rendering": true,
-    "min_x_angle": -90,
-    "max_x_angle": 50,
-    "min_y_angle": -70,
-    "max_y_angle": 70,
-    "min_z_angle": -50,
-    "max_z_angle": 50
+    "min_x_angle": -40,
+    "max_x_angle": 40,
+    "min_y_angle": -80,
+    "max_y_angle": 80,
+    "min_z_angle": -20,
+    "max_z_angle": 20
   },
   "preparedata": {
-    "raw_data_dir": "Data/FaceCNN/CUSTOM/",
-    "processed_data_dir": "Data/FaceCNN/CUSTOM_processed/",
-    "off_screen_rendering": false
+    "raw_data_dir": "",
+    "processed_data_dir": "",
+    "off_screen_rendering": true
   },
   "pre-align": {
     "align_center_of_mass": true,
-    "rot_x": -90,
+    "rot_x": 0,
     "rot_y": 0,
     "rot_z": 0,
     "scale": 1,

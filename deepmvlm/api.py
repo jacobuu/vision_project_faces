@@ -5,6 +5,32 @@ from utils3d import Render3D
 from prediction import Predict2D
 from torch.utils.model_zoo import load_url
 import os
+import cv2
+from matplotlib import pyplot as plt
+import numpy as np
+
+models_urls = {
+    'MVLMModel_DTU3D-RGB':
+        'https://shapeml.compute.dtu.dk/Deep-MVLM/models/MVLMModel_DTU3D_RGB_07092019_only_state_dict-c0255a70.pth',
+    'MVLMModel_DTU3D-depth':
+        'https://shapeml.compute.dtu.dk/Deep-MVLM/models/MVLMModel_DTU3D_Depth_19092019_only_state_dict-95b89b63.pth',
+    'MVLMModel_DTU3D-geometry':
+        'https://shapeml.compute.dtu.dk/Deep-MVLM/models/MVLMModel_DTU3D_geometry_only_state_dict-41851074.pth',
+    'MVLMModel_DTU3D-geometry+depth':
+        'https://shapeml.compute.dtu.dk/Deep-MVLM/models/MVLMModel_DTU3D_geometry+depth_20102019_15epoch_only_state_dict-73b20e31.pth',
+    'MVLMModel_DTU3D-RGB+depth':
+        'https://shapeml.compute.dtu.dk/Deep-MVLM/models/MVLMModel_DTU3D_RGB+depth_20092019_only_state_dict-e3c12463a9.pth',
+    'MVLMModel_BU_3DFE-RGB':
+        'https://shapeml.compute.dtu.dk/Deep-MVLM/models/MVLMModel_BU_3DFE_RGB_24092019_6epoch_only_state_dict-eb652074.pth',
+    'MVLMModel_BU_3DFE-depth':
+        'https://shapeml.compute.dtu.dk/Deep-MVLM/models/MVLMModel_BU_3DFE_depth_10102019_4epoch_only_state_dict-e2318093.pth',
+    'MVLMModel_BU_3DFE-geometry':
+        'https://shapeml.compute.dtu.dk/Deep-MVLM/models/MVLMModel_BU_3DFE_geometry_02102019_4epoch-only_state_dict-f85518fa.pth',
+    'MVLMModel_BU_3DFE-RGB+depth':
+        'https://shapeml.compute.dtu.dk/Deep-MVLM/models/MVLMModel_BU_3DFE_RGB+depth_05102019_5epoch_only_state_dict-297955f6.pth',
+    'MVLMModel_BU_3DFE-geometry+depth':
+        'https://shapeml.compute.dtu.dk/Deep-MVLM/models/MVLMModel_BU_3DFE_geometry+depth_17102019_13epoch_only_state_dict-aa34a6d68.pth'
+  }
 
 
 class DeepMVLM:
@@ -46,19 +72,20 @@ class DeepMVLM:
         model_name = self.config['name']
         image_channels = self.config['data_loader']['args']['image_channels']
         name_channels = model_name + '-' + image_channels
-        check_point_name = name_channels + '.pth'
+        check_point_name = models_urls[name_channels]
+        # check_point_name = name_channels + '.pth' # DECOMMENTARE SE TRAIN LOCALE
 
         print('Getting device')
         device, device_ids = self._prepare_device(self.config['n_gpu'])
 
         logger.info('Loading checkpoint: {}'.format(check_point_name))
 
-        # checkpoint = load_url(check_point_name, model_dir, map_location=device)
-        checkpoint = torch.load(model_dir + check_point_name, map_location=device)
-        # Write clean model - should only be done once for translation of models
-        base_name = os.path.basename(os.path.splitext(check_point_name)[0])
-        clean_file = 'saved/trained/' + base_name + '_only_state_dict.pth'
-        torch.save(checkpoint['state_dict'], clean_file)
+        checkpoint = load_url(check_point_name, model_dir, map_location=device)
+        # checkpoint = torch.load(model_dir + check_point_name, map_location=device) # DECOMMENTARE SE TRAIN LOCALE
+        # Write clean model - should only be done once for translation of models # DECOMMENTARE SE TRAIN LOCALE
+        # base_name = os.path.basename(os.path.splitext(check_point_name)[0]) # DECOMMENTARE SE TRAIN LOCALE
+        # clean_file = 'saved/trained/' + base_name + '_only_state_dict.pth' # DECOMMENTARE SE TRAIN LOCALE
+        # torch.save(checkpoint['state_dict'], clean_file) # DECOMMENTARE SE TRAIN LOCALE
 
         state_dict = []
         # Hack until all dicts are transformed
@@ -129,6 +156,28 @@ class DeepMVLM:
     def predict_one_file(self, file_name):
         render_3d = Render3D(self.config)
         image_stack, transform_stack = render_3d.render_3d_file(file_name)
+        # print(image_stack[0].shape)
+        # # Assuming you have your RGBD image as a NumPy ndarray named 'rgbd_image'
+        # # Create a 2x2 grid for displaying RGB and Depth images side by side
+        # fig, axes = plt.subplots(1, 2, figsize=(10, 5))
+
+        # # Display the RGB image
+        # print(image_stack[0][:, :, :3])
+        # print(image_stack[0][:, :, :3].min())
+        # print(image_stack[0][:, :, :3].max())
+        # axes[0].imshow(image_stack[0][:, :, :3])
+        # axes[0].set_title('RGB Image')
+        # axes[0].axis('off')
+
+        # # Display the Depth image
+        # depth_image = image_stack[0][:, :, 3]
+        # axes[1].imshow(depth_image, cmap='jet')
+        # axes[1].set_title('Depth Image')
+        # axes[1].axis('off')
+        
+
+        # plt.tight_layout()
+        # plt.show()
 
         predict_2d = Predict2D(self.config, self.model, self.device)
         heatmap_maxima = predict_2d.predict_heatmaps_from_images(image_stack)

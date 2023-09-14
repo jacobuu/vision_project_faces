@@ -102,8 +102,11 @@ class Render3D:
         obj_dir = os.path.dirname(file_name)
         obj_in = vtk.vtkOBJImporter()
         obj_in.SetFileName(file_name)
+        print('Reading ', file_name)
         obj_in.SetFileNameMTL(mtl_name)
+        print('Reading ', obj_in.GetFileNameMTL())
         obj_in.SetTexturePath(obj_dir)
+        print('Reading textures from ', obj_dir)
         obj_in.Update()
 
         # Initialize Camera

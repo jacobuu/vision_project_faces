@@ -25,7 +25,7 @@ def landmks_load(filename):
 def mesh_load(obj_file):
     reader = pv.get_reader(obj_file)
     mesh = reader.read()
-    assert mesh.is_all_triangles()
+    #assert mesh.is_all_triangles()
     mesh["ID"] = [i for i in range(mesh.n_points)] # add IDs
     return mesh
 
@@ -81,28 +81,28 @@ def main(argv):
     DATA_DIR = path
     face = dir_name
 
-    pv.set_jupyter_backend('pythreejs')
+    # pv.set_jupyter_backend('pythreejs')
     l1_obj = f'{DATA_DIR}/{face}.obj'
     l1_img = f'{DATA_DIR}/{face}.jpg'
     file_lks = f'{DATA_DIR}/{face}_landmarks.txt'
-    file_true_lks = f'{DATA_DIR}/{face}.txt'
+    # file_true_lks = f'{DATA_DIR}/{face}.txt'
     # load mesh from obj file
     mesh = mesh_load(l1_obj)
 
     # load landmarks
     landmks, ldks_ID = landmks_load(file_lks)
-    landmks_TRUE, ldks_TRUE_ID = landmks_load(file_true_lks)
-    RMSE = compute_metrics(landmks, landmks_TRUE)
-    print(f"RMSE: {RMSE}")
-    poly2 = pv.PolyData(landmks_TRUE)
-    poly2["id"] = ldks_TRUE_ID
+    # landmks_TRUE, ldks_TRUE_ID = landmks_load(file_true_lks)
+    # RMSE = compute_metrics(landmks, landmks_TRUE)
+    # print(f"RMSE: {RMSE}")
+    # poly2 = pv.PolyData(landmks_TRUE)
+    # poly2["id"] = ldks_TRUE_ID
     poly = pv.PolyData(landmks)
     poly["id"] = ldks_ID
 
     pl = pv.Plotter()
     pl.add_mesh(mesh, show_edges=False, color='white')
     pl.add_point_labels(poly, "id", point_size=1.0, text_color='white', shape_color='red')
-    pl.add_point_labels(poly2, "id", point_size=1.0, text_color='white', shape_color='black')
+    # pl.add_point_labels(poly2, "id", point_size=1.0, text_color='white', shape_color='black')
     pl.camera_position = 'xy'
     pl.show()
 
