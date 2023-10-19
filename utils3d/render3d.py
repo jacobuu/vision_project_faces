@@ -8,7 +8,7 @@ from vtk.util.numpy_support import vtk_to_numpy
 import os
 
 from utils3d import Utils3D
-
+import open3d as o3d
 
 def no_transform():
     rx = 0
@@ -121,7 +121,7 @@ class Render3D:
         ren_win = vtk.vtkRenderWindow()
         ren_win.AddRenderer(ren)
         ren_win.SetSize(win_size, win_size)
-        ren_win.SetOffScreenRendering(off_screen_rendering)
+        ren_win.SetOffScreenRendering(True)
 
         obj_in.SetRenderWindow(ren_win)
         obj_in.Update()
@@ -190,7 +190,6 @@ class Render3D:
             ren.GetActiveCamera().SetViewUp(0, 1, 0)
             ren.GetActiveCamera().ApplyTransform(t.GetInverse())
             ren.ResetCameraClippingRange()  # This approach is not recommended when doing depth rendering
-
             ren_win.Render()
 
             if write_image_files:
@@ -259,7 +258,7 @@ class Render3D:
             writer.Write()
 
         return trans.GetOutput()
-
+    
     def render_3d_multi_rgb_geometry_depth(self, transform_stack, file_name):
         write_image_files = self.config['process_3d']['write_renderings']
         off_screen_rendering = self.config['process_3d']['off_screen_rendering']
@@ -301,7 +300,7 @@ class Render3D:
         ren_win = vtk.vtkRenderWindow()
         ren_win.AddRenderer(ren)
         ren_win.SetSize(win_size, win_size)
-        ren_win.SetOffScreenRendering(off_screen_rendering)
+        ren_win.SetOffScreenRendering(True)
 
         t = vtk.vtkTransform()
         t.Identity()
@@ -472,6 +471,112 @@ class Render3D:
         self.logger.debug("File load and rendering time: " + str(end - start))
 
         return image_stack
+
+    # def render_3d_multi_rgb_geometry_depth(self, transform_stack, file_name):
+    #     write_image_files = self.config['process_3d']['write_renderings']
+    #     off_screen_rendering = self.config['process_3d']['off_screen_rendering']
+    #     n_views = self.config['data_loader']['args']['n_views']
+    #     img_size = self.config['data_loader']['args']['image_size']
+    #     win_size = img_size
+    #     slack = 5
+
+    #     start = time.time()
+    #     self.logger.debug('Rendering')
+
+    #     n_channels = 5  # 3 for RGB, 1 for depth, and 1 for geometry
+    #     image_stack = np.zeros((n_views, win_size, win_size, n_channels), dtype=np.float32)
+
+    #     # Load the 3D object
+    #     mesh = o3d.io.read_triangle_mesh(file_name)
+    #     if len(mesh.vertices) < 1:
+    #         print('Could not read', file_name)
+    #         return None
+
+    #     mesh = self.apply_pre_transformation(mesh)
+        
+    #     # Create a texture if available
+    #     try:
+    #         texture_img = o3d.io.read_image(file_name[:-4] + ".jpg")  # Replace with your texture image file
+    #     except:
+    #         texture_img = None
+
+    #     if texture_img is not None:
+    #         print(mesh)
+    #         mesh.textures = [o3d.geometry.Image(texture_img)]
+
+    #     for view in range(n_views):
+    #         name_rgb = str(self.config.temp_dir / ('rendering' + str(view) + '_RGB.png'))
+    #         name_depth = str(self.config.temp_dir / ('rendering' + str(view) + '_zbuffer.png'))
+    #         name_geometry = str(self.config.temp_dir / ('rendering' + str(view) + '_geometry.png'))
+
+    #         # Apply transformations to the mesh
+    #         rx, ry, rz, s, tx, ty = transform_stack[view]
+    #         # Apply transformations to the mesh
+
+    #         R = mesh.get_rotation_matrix_from_xyz((rx, ry, rz))
+    #         mesh.rotate(R, center=(0, 0, 0))
+    #         mesh.scale(s, center=(0, 0, 0))
+    #         mesh.translate((tx, ty, 0))
+
+    #         # Create a camera
+    #         # Create a PinholeCameraParameters object
+    #         camera = o3d.camera.PinholeCameraParameters()
+
+    #         # Set camera extrinsic matrix (4x4 transformation matrix)
+    #         extrinsic = np.eye(4)  # Identity matrix for the extrinsic matrix
+    #         camera.extrinsic = extrinsic
+
+    #         # Set camera intrinsic parameters (PinholeCameraIntrinsic object)
+    #         intrinsics = o3d.camera.PinholeCameraIntrinsic(
+    #             width=win_size,
+    #             height=win_size,
+    #             fx=win_size / 2,
+    #             fy=win_size / 2,
+    #             cx=win_size / 2,
+    #             cy=win_size / 2
+    #         )
+    #         camera.intrinsic = intrinsics
+
+    #         # Render the scene
+    #         render_opt = o3d.visualization.RenderOption()
+    #         render_opt.background_color = np.asarray([1.0, 1.0, 1.0])
+    #         render_opt.point_size = 1
+
+    #         renderer = o3d.visualization.rendering.OffscreenRenderer(win_size, win_size)
+
+    #         material = o3d.visualization.rendering.MaterialRecord()
+
+    #         renderer.scene.add_geometry("mesh", geometry=mesh, material=material)
+    #         # renderer.scene.camera = camera
+    #         # renderer.scene.option = render_opt
+    #         renderer.scene.set_background(np.asarray([1.0, 1.0, 1.0, 1.0]))
+
+    #         # Save textured image
+    #         rgb_image = renderer.render_to_image()
+    #         rgb_data = np.array(rgb_image)
+    #         image_stack[view, :, :, 0:3] = rgb_data[:, :, 0:3]
+
+    #         # Save depth image
+    #         depth_image = renderer.render_to_depth_image()
+    #         depth_data = np.array(depth_image)
+            
+    #         image_stack[view, :, :, 4] = depth_data
+
+    #         # Save geometry image
+    #         geometry_image = renderer.render_to_pointcloud()
+    #         geometry_data = np.array(geometry_image.colors)
+    #         image_stack[view, :, :, 3:4] = geometry_data[:, :, 0:1]
+
+    #         if write_image_files:
+    #             o3d.io.write_image(name_rgb, rgb_image)
+    #             o3d.io.write_image(name_depth, depth_image)
+    #             o3d.io.write_image(name_geometry, geometry_image)
+
+    #     del renderer, mesh, texture_img
+    #     end = time.time()
+    #     self.logger.debug("File load and rendering time: " + str(end - start))
+
+    #     return image_stack
 
     def render_3d_file(self, file_name):
         image_channels = self.config['data_loader']['args']['image_channels']
@@ -690,6 +795,5 @@ class Render3D:
         style = vtk.vtkInteractorStyleTrackballCamera()
         iren.SetInteractorStyle(style)
         iren.SetRenderWindow(ren_win)
-
         ren_win.Render()
         iren.Start()

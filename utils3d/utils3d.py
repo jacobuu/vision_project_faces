@@ -263,6 +263,7 @@ class Utils3D:
 
         if used_lines == -1:
             self.logger.warning('Ransac failed - estimating from all lines')
+            raise ValueError('Ransac failed - estimating from all lines')
             best_p = self.compute_intersection_between_lines(pa, pb)
         # else:
         # print('Ransac error ', best_error, ' with ', used_lines, ' lines')
