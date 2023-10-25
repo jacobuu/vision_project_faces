@@ -1,3 +1,3 @@
-python predict.py --c configs\CUSTOM-RGB+depth_high_range.json --n Data\FaceCNN\CUSTOM\faces3D\1
+python predict.py --c configs/BU_3DFE-geometry+depth.json --n /mnt/43fba879-48e4-4e4c-afb2-dcb7e861c868/sftp/datasets/BP4D+_v0.2/dataset_neutral/Neutral_10_5
 python show_result.py Data\FaceCNN\CUSTOM\faces3D\1
 python analytics.py 

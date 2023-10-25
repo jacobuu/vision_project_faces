@@ -27,7 +27,7 @@ class DeepMVLM:
     def __init__(self, config):
         self.config = config
         # self.device, self.model = self._get_device_and_load_model()
-        self.logger = config.get_logger("predict")
+        # self.logger = config.get_logger("predict")
         self.device, self.model = self._get_device_and_load_model_from_url()
 
     def _prepare_device(self, n_gpu_use):
@@ -65,7 +65,7 @@ class DeepMVLM:
 
         print("Getting device")
         device, device_ids = self._prepare_device(self.config["n_gpu"])
-
+        print(device)
         logger.info("Loading checkpoint: {}".format(check_point_name))
 
         checkpoint = load_url(check_point_name, model_dir, map_location=device)
